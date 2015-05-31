@@ -3,6 +3,7 @@ import Board = require('engine/Board')
 import Hex = require('engine/Hex')
 import Tile = require('engine/Tile')
 import Hashtable = require('util/Hashtable')
+import RotateAction = require('engine/action/RotateAction')
 
 class BoardDisplay extends Pixi.Container {
     board:Board;
@@ -20,14 +21,13 @@ class BoardDisplay extends Pixi.Container {
         this.hitArea = new Pixi.Rectangle(-400, -300, 800, 600);
         var eventy:any = this;
         eventy.interactive = true;
-        eventy.on('click',function(){
-            //alert('huh?');
-            alert('hi');
+        eventy.on('click',function(event){
+            var point = event.data.getLocalPosition(this);
+            var hexPoint = Hex.ToHexPoint(point, this.hexSize, Hex.CartesianOrientation.FlatTop);
+
+            //rotate the tile clockwise
+            board.ExecuteAction(new RotateAction(hexPoint, -1));
         });
-    }
-
-    public init(){
-
     }
 
     private adjustTiles(){
@@ -36,11 +36,11 @@ class BoardDisplay extends Pixi.Container {
         this.board.getTiles().forEach((tile, i)=> {
             var tileDisplay = this.tileDisplays.get(tile.hexPoint);
             if(!tileDisplay) {
-                tileDisplay = new TileDisplay(tile.tile, 60);
+                tileDisplay = new TileDisplay(tile.tile, this.hexSize);
                 this.addChild(tileDisplay);
             }
 
-            var cartPoint = Hex.ToCartesianCoordinate(tile.hexPoint, 40, Hex.CartesianOrientation.FlatTop);
+            var cartPoint = Hex.ToCartesianPoint(tile.hexPoint, this.hexSize, Hex.CartesianOrientation.FlatTop);
             tileDisplay.x = cartPoint.x;
             tileDisplay.y = cartPoint.y;
             newTileDisplays.put(tile.hexPoint, tileDisplay);
@@ -62,20 +62,49 @@ class BoardDisplay extends Pixi.Container {
 
 }
 
-class TileDisplay extends Pixi.Sprite{
+class TileDisplay extends Pixi.Container{
     constructor(tile: Tile, hexSize: number) {
-        super(Pixi.Texture.fromImage('ui/assets/sprites/actors/mole.png'))
-        this.anchor.x = 0.5;
-        this.anchor.y = 0.5;
+        super();
 
-        //this.interactive = true;
-        //this.on('click',function(){
-        //    //alert('huh?');
-        //    this.rotation+= Math.PI / 3 ;
-        //});
+        var graphics = this.createHexagon(hexSize);
+        this.addChild(graphics);
 
+        //placeholder
+        var sprite = new Pixi.Sprite(Pixi.Texture.fromImage('ui/assets/sprites/actors/mole.png'));
+        sprite.anchor.x = 0.5;
+        sprite.anchor.y = 0.5;
+        this.addChild(sprite);
 
+        tile.paths.observe((change)=>{
+           var toCanonical = change.newValue.turnsToCanonical();
+            this.rotation = toCanonical.turns * (Math.PI / 3)
+        });
     }
+
+    private createHexagon(hexSize:number):Pixi.Graphics {
+        var dimensions = Hex.CartesianDimensions(hexSize,  Hex.CartesianOrientation.FlatTop);
+        var width = dimensions.width;
+        var height = dimensions.height;
+        var halfWidth = width/2;
+        var halfHeight = height/2;
+        var quarterWidth = width/4;
+        var quarterHeight = height/4;
+
+
+        var graphics = new Pixi.Graphics();
+        graphics.beginFill(0xFF3300);
+        graphics.lineStyle(1, 0xaaaaaa, 1);
+        graphics.moveTo(-halfWidth,0);
+        graphics.lineTo(-quarterWidth, halfHeight);
+        graphics.lineTo(quarterWidth, halfHeight);
+        graphics.lineTo(halfWidth, 0);
+        graphics.lineTo(quarterWidth, -halfHeight);
+        graphics.lineTo(-quarterWidth, -halfHeight);
+        graphics.endFill();
+
+        return graphics;
+    }
+
 }
 
 export = BoardDisplay;

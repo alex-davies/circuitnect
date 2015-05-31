@@ -39,7 +39,7 @@ define(["require", "exports", "lib/pixi/3.0.5/pixi", 'engine/Board', 'ui/BoardDi
     document.body.appendChild(renderer.view);
     Pixi.loader.add('terrain', 'ui/assets/sprites/Terrain.json');
     Pixi.loader.once('complete', function () {
-        boardDisplay = new BoardDisplay(board, 60);
+        boardDisplay = new BoardDisplay(board, 40);
         boardDisplay.position.x = 400;
         boardDisplay.position.y = 300;
         Pixi.ticker.shared.add(function (time) {

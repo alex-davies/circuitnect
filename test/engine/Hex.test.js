@@ -59,15 +59,23 @@ define(["require", "exports", '../../engine/Hex'], function (require, exports, H
             ]);
         });
         QUnit.test("CartesianCoordinate - FlatTop move only in Y direction", function (assert) {
-            var cart = Hex.ToCartesianCoordinate({ a: 1, b: 0 }, 10, 0 /* FlatTop */);
+            var cart = Hex.ToCartesianPoint({ a: 1, b: 0 }, 10, 0 /* FlatTop */);
             assert.equal(cart.x, 0);
-            assert.equal(cart.y, Hex.CartesianHeight(10, 0 /* FlatTop */));
+            assert.equal(cart.y, Hex.CartesianDimensions(10, 0 /* FlatTop */).height);
         });
         QUnit.test("CartesianCoordinate - FlatTop move only in X direction", function (assert) {
-            var cart = Hex.ToCartesianCoordinate({ a: -1, b: 2 }, 10, 0 /* FlatTop */);
-            assert.equal(cart.x, Hex.CartesianWidth(10, 0 /* FlatTop */) + 10);
+            var cart = Hex.ToCartesianPoint({ a: -1, b: 2 }, 10, 0 /* FlatTop */);
+            assert.equal(cart.x, Hex.CartesianDimensions(10, 0 /* FlatTop */).width + 10);
             assert.equal(cart.y, 0);
         });
+        QUnit.test("CartesianDimensions - FlatTop single tile dimensions", function (assert) {
+            var dimensions = Hex.CartesianDimensions(10, 0 /* FlatTop */);
+            assert.equal(dimensions.width, 20);
+            decEqual(assert, dimensions.height, 17.3, 0.1, '');
+        });
+        function decEqual(assert, actual, expected, tolerance, message) {
+            assert.ok(Math.abs(actual - expected) <= tolerance, message);
+        }
     }
     exports.run = run;
 });

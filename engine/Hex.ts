@@ -56,28 +56,24 @@ class Hex{
     }
 
 
-    public static CartesianWidth(hexSize:number, orientation:Hex.CartesianOrientation):number{
-        switch(orientation){
-            case Hex.CartesianOrientation.FlatTop:
-                return hexSize * 2;
-            case Hex.CartesianOrientation.PointyTop:
-                return Math.sqrt(3) * hexSize;
-            default:
-                throw new Error("Unknown orientation '"+orientation+"'");
-        }
-    }
-    public static CartesianHeight(hexSize:number, orientation:Hex.CartesianOrientation):number{
+    public static CartesianDimensions(hexSize:number, orientation:Hex.CartesianOrientation) : {width:numbe; height:number}{
         switch(orientation){
             case Hex.CartesianOrientation.PointyTop:
-                return hexSize * 2;
+                return {
+                    width: Math.sqrt(3) * hexSize,
+                    height: hexSize * 2
+                };
             case Hex.CartesianOrientation.FlatTop:
-                return Math.sqrt(3) * hexSize;
+                return {
+                    width: hexSize * 2,
+                    height:Math.sqrt(3) * hexSize
+                };
             default:
                 throw new Error("Unknown orientation '"+orientation+"'");
         }
     }
 
-    public static ToCartesianCoordinate(point:Hex.Point, hexSize:number, orientation:Hex.CartesianOrientation):{x:number;y:number}{
+    public static ToCartesianPoint(point:Hex.Point, hexSize:number, orientation:Hex.CartesianOrientation):{x:number;y:number}{
         switch(orientation){
             case Hex.CartesianOrientation.PointyTop:
                 return {
@@ -92,6 +88,45 @@ class Hex{
             default:
                 throw new Error("Unknown orientation '"+orientation+"'");
         }
+    }
+
+    public static ToHexPoint(point:{x:number; y:number}, hexSize:number, orientation:Hex.CartesianOrientation){
+        switch(orientation){
+            case Hex.CartesianOrientation.PointyTop:
+                return Hex.Round({
+                    b:(point.x * Math.sqrt(3)/3 - point.y / 3) / hexSize,
+                    a:point.y * 2/3 / hexSize,
+                });
+            case Hex.CartesianOrientation.FlatTop:
+                return Hex.Round({
+                    b:point.x * 2/3 / hexSize,
+                    a:(-point.x / 3 + Math.sqrt(3)/3 * point.y) / hexSize
+                });
+            default:
+                throw new Error("Unknown orientation '"+orientation+"'");
+        }
+    }
+
+    private static Round(point:Hex.Point) : Hex.Point{
+        //return {
+        //    a: Math.round(point.a),
+        //    b: Math.round(point.b)
+        //};
+
+        var ra = Math.round(point.a)
+        var rb = Math.round(point.b)
+        var rc = Math.round(-point.a-point.b)
+
+        var a_diff = Math.abs(ra - point.a)
+        var b_diff = Math.abs(rb - point.b)
+        var c_diff = Math.abs(rc - (-point.a-point.b))
+
+        if (a_diff > b_diff && a_diff > c_diff)
+            ra = -rb-rc
+        else if (b_diff > c_diff)
+            rb = -ra-rc
+
+        return {a:ra, b:rb}
     }
 
 
@@ -115,6 +150,8 @@ module Hex {
 
     export class DirectionSet{
         public static Canonical = [
+            new DirectionSet([]),
+
             new DirectionSet([Hex.Direction.a]),
 
             new DirectionSet([Hex.Direction.a, Hex.Direction.b]),
@@ -147,7 +184,7 @@ module Hex {
         }
 
         public turn(turnAmount:number = 1):Hex.DirectionSet {
-            var result;
+            var result = [];
             var directionArray = this.values();
             for(var i=0;i<directionArray.length;i++){
                 result.push(Hex.Turn(directionArray[i], turnAmount))

@@ -49,7 +49,7 @@ document.body.appendChild(renderer.view);
 Pixi.loader.add('terrain','ui/assets/sprites/Terrain.json');
 Pixi.loader.once('complete',() => {
 
-    boardDisplay = new BoardDisplay(board,60);
+    boardDisplay = new BoardDisplay(board,40);
     boardDisplay.position.x = 400;
     boardDisplay.position.y = 300;
 

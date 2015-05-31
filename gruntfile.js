@@ -1,8 +1,7 @@
 module.exports = function(grunt) {
-  grunt.loadNpmTasks('grunt-typescript');
-  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-open');
+  grunt.loadNpmTasks('grunt-keepalive');
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -10,31 +9,9 @@ module.exports = function(grunt) {
       server: {
         options: {
           port: 55775,
-          base: './'
+          base: './',
         }
       }
-    },
-    typescript: {
-      base: {
-        src: ['index.ts'],
-        dest: 'index.js',
-        options: {
-          module: 'amd',
-          target: 'es5'
-        }
-      },
-      test: {
-        src: ['test.ts'],
-        dest: 'test.js',
-        options: {
-          module: 'amd',
-          target: 'es5'
-        }
-      }
-    },
-    watch: {
-      files: ['**/*.ts','**/*.html'],
-      tasks: ['connect']
     },
     open: {
       dev: {
@@ -42,12 +19,11 @@ module.exports = function(grunt) {
         app: 'Chrome'
       },
       test: {
-        path: 'http://localhost:55775/test.html',
+        path: 'http://localhost:55775/test/index.html',
         app: 'Chrome'
       }
     }
   });
 
-  grunt.registerTask('default', ['connect', 'open', 'watch']);
-  grunt.registerTask('test', ['connect', 'open:test', 'watch']);
+  grunt.registerTask('default', ['connect', 'open', 'keepalive']);
 };

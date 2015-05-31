@@ -8,9 +8,11 @@ class RotateAction{
     execute(board:Board){
         var tile = board.getTile(this.hexPoint);
         if(tile){
-            tile.paths = Hex.TurnDirectionSet(tile.paths, this.rotateCount);
+            tile.paths(tile.paths().turn(this.rotateCount));
         }
-
+        else{
+            console.debug('No tile found at point', this.hexPoint);
+        }
     }
 }
 export = RotateAction;

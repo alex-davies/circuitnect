@@ -50,27 +50,23 @@ define(["require", "exports"], function (require, exports) {
             }
             return result;
         };
-        Hex.CartesianWidth = function (hexSize, orientation) {
+        Hex.CartesianDimensions = function (hexSize, orientation) {
             switch (orientation) {
-                case 0 /* FlatTop */:
-                    return hexSize * 2;
                 case 1 /* PointyTop */:
-                    return Math.sqrt(3) * hexSize;
+                    return {
+                        width: Math.sqrt(3) * hexSize,
+                        height: hexSize * 2
+                    };
+                case 0 /* FlatTop */:
+                    return {
+                        width: hexSize * 2,
+                        height: Math.sqrt(3) * hexSize
+                    };
                 default:
                     throw new Error("Unknown orientation '" + orientation + "'");
             }
         };
-        Hex.CartesianHeight = function (hexSize, orientation) {
-            switch (orientation) {
-                case 1 /* PointyTop */:
-                    return hexSize * 2;
-                case 0 /* FlatTop */:
-                    return Math.sqrt(3) * hexSize;
-                default:
-                    throw new Error("Unknown orientation '" + orientation + "'");
-            }
-        };
-        Hex.ToCartesianCoordinate = function (point, hexSize, orientation) {
+        Hex.ToCartesianPoint = function (point, hexSize, orientation) {
             switch (orientation) {
                 case 1 /* PointyTop */:
                     return {
@@ -85,6 +81,39 @@ define(["require", "exports"], function (require, exports) {
                 default:
                     throw new Error("Unknown orientation '" + orientation + "'");
             }
+        };
+        Hex.ToHexPoint = function (point, hexSize, orientation) {
+            switch (orientation) {
+                case 1 /* PointyTop */:
+                    return Hex.Round({
+                        b: (point.x * Math.sqrt(3) / 3 - point.y / 3) / hexSize,
+                        a: point.y * 2 / 3 / hexSize,
+                    });
+                case 0 /* FlatTop */:
+                    return Hex.Round({
+                        b: point.x * 2 / 3 / hexSize,
+                        a: (-point.x / 3 + Math.sqrt(3) / 3 * point.y) / hexSize
+                    });
+                default:
+                    throw new Error("Unknown orientation '" + orientation + "'");
+            }
+        };
+        Hex.Round = function (point) {
+            //return {
+            //    a: Math.round(point.a),
+            //    b: Math.round(point.b)
+            //};
+            var ra = Math.round(point.a);
+            var rb = Math.round(point.b);
+            var rc = Math.round(-point.a - point.b);
+            var a_diff = Math.abs(ra - point.a);
+            var b_diff = Math.abs(rb - point.b);
+            var c_diff = Math.abs(rc - (-point.a - point.b));
+            if (a_diff > b_diff && a_diff > c_diff)
+                ra = -rb - rc;
+            else if (b_diff > c_diff)
+                rb = -ra - rc;
+            return { a: ra, b: rb };
         };
         Hex.ZeroPoint = { a: 0, b: 0 };
         return Hex;
@@ -116,7 +145,7 @@ define(["require", "exports"], function (require, exports) {
             };
             DirectionSet.prototype.turn = function (turnAmount) {
                 if (turnAmount === void 0) { turnAmount = 1; }
-                var result;
+                var result = [];
                 var directionArray = this.values();
                 for (var i = 0; i < directionArray.length; i++) {
                     result.push(Hex.Turn(directionArray[i], turnAmount));
@@ -154,6 +183,7 @@ define(["require", "exports"], function (require, exports) {
                 return true;
             };
             DirectionSet.Canonical = [
+                new DirectionSet([]),
                 new DirectionSet([0 /* a */]),
                 new DirectionSet([0 /* a */, 1 /* b */]),
                 new DirectionSet([0 /* a */, 2 /* c */]),

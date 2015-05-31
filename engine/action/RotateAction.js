@@ -1,4 +1,4 @@
-define(["require", "exports", 'engine/Hex'], function (require, exports, Hex) {
+define(["require", "exports"], function (require, exports) {
     var RotateAction = (function () {
         function RotateAction(hexPoint, rotateCount) {
             if (rotateCount === void 0) { rotateCount = 1; }
@@ -8,7 +8,10 @@ define(["require", "exports", 'engine/Hex'], function (require, exports, Hex) {
         RotateAction.prototype.execute = function (board) {
             var tile = board.getTile(this.hexPoint);
             if (tile) {
-                tile.paths = Hex.TurnDirectionSet(tile.paths, this.rotateCount);
+                tile.paths(tile.paths().turn(this.rotateCount));
+            }
+            else {
+                console.debug('No tile found at point', this.hexPoint);
             }
         };
         return RotateAction;
