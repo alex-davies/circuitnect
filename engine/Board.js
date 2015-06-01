@@ -6,7 +6,11 @@ define(["require", "exports", './Hex', './Tile', 'util/Hashtable'], function (re
             var points = Hex.Spiral(Hex.ZeroPoint, radius);
             for (var i = 0; i < points.length; i++) {
                 var point = points[i];
-                this.hexStore.put(point, new Tile());
+                var tile = new Tile();
+                var canonicals = Hex.DirectionSet.Canonical;
+                var random = canonicals[Math.floor(Math.random() * canonicals.length)];
+                tile.paths(random);
+                this.hexStore.put(point, tile);
             }
         }
         Board.prototype.getTiles = function () {

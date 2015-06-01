@@ -46,7 +46,7 @@ var renderer = Pixi.autoDetectRenderer(800, 600,{backgroundColor : 0x1099bb});
 document.body.appendChild(renderer.view);
 
 
-Pixi.loader.add('terrain','ui/assets/sprites/Terrain.json');
+Pixi.loader.add('terrain','ui/assets/sprites/sprites.json');
 Pixi.loader.once('complete',() => {
 
     boardDisplay = new BoardDisplay(board,40);

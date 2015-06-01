@@ -52,20 +52,36 @@ define(["require", "exports", "lib/pixi/3.0.5/pixi", 'engine/Hex', 'util/Hashtab
     var TileDisplay = (function (_super) {
         __extends(TileDisplay, _super);
         function TileDisplay(tile, hexSize) {
-            var _this = this;
             _super.call(this);
-            var graphics = this.createHexagon(hexSize);
-            this.addChild(graphics);
+            var hexagon = this.createHexagon(hexSize);
+            this.addChild(hexagon);
             //placeholder
-            var sprite = new Pixi.Sprite(Pixi.Texture.fromImage('ui/assets/sprites/actors/mole.png'));
+            var spriteName = this.getSpriteName(tile.paths());
+            var sprite = new Pixi.Sprite(Pixi.Texture.fromImage(spriteName));
+            var dimensions = Hex.CartesianDimensions(hexSize, 0 /* FlatTop */);
+            var ratio = sprite.height / sprite.width;
+            sprite.width = dimensions.width;
+            sprite.height = dimensions.width;
             sprite.anchor.x = 0.5;
             sprite.anchor.y = 0.5;
+            sprite.mask = hexagon;
+            sprite.tint = 0x00FF00;
             this.addChild(sprite);
             tile.paths.observe(function (change) {
                 var toCanonical = change.newValue.turnsToCanonical();
-                _this.rotation = toCanonical.turns * (Math.PI / 3);
+                sprite.rotation = toCanonical.turns * (Math.PI / 3);
             });
         }
+        TileDisplay.prototype.getSpriteName = function (directionSet) {
+            var name = '';
+            name += directionSet.contains(0 /* a */) ? '1' : '0';
+            name += directionSet.contains(1 /* b */) ? '1' : '0';
+            name += directionSet.contains(2 /* c */) ? '1' : '0';
+            name += directionSet.contains(3 /* neg_a */) ? '1' : '0';
+            name += directionSet.contains(4 /* neg_b */) ? '1' : '0';
+            name += directionSet.contains(5 /* neg_c */) ? '1' : '0';
+            return name + '.png';
+        };
         TileDisplay.prototype.createHexagon = function (hexSize) {
             var dimensions = Hex.CartesianDimensions(hexSize, 0 /* FlatTop */);
             var width = dimensions.width;

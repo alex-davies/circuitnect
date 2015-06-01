@@ -37,7 +37,7 @@ define(["require", "exports", "lib/pixi/3.0.5/pixi", 'engine/Board', 'ui/BoardDi
     // You can use either PIXI.WebGLRenderer or PIXI.CanvasRenderer
     var renderer = Pixi.autoDetectRenderer(800, 600, { backgroundColor: 0x1099bb });
     document.body.appendChild(renderer.view);
-    Pixi.loader.add('terrain', 'ui/assets/sprites/Terrain.json');
+    Pixi.loader.add('terrain', 'ui/assets/sprites/sprites.json');
     Pixi.loader.once('complete', function () {
         boardDisplay = new BoardDisplay(board, 40);
         boardDisplay.position.x = 400;

@@ -66,19 +66,41 @@ class TileDisplay extends Pixi.Container{
     constructor(tile: Tile, hexSize: number) {
         super();
 
-        var graphics = this.createHexagon(hexSize);
-        this.addChild(graphics);
+        var hexagon = this.createHexagon(hexSize);
+        this.addChild(hexagon);
 
         //placeholder
-        var sprite = new Pixi.Sprite(Pixi.Texture.fromImage('ui/assets/sprites/actors/mole.png'));
+        var spriteName = this.getSpriteName(tile.paths());
+        var sprite = new Pixi.Sprite(Pixi.Texture.fromImage(spriteName));
+        var dimensions = Hex.CartesianDimensions(hexSize, Hex.CartesianOrientation.FlatTop);
+        var ratio = sprite.height / sprite.width;
+        sprite.width = dimensions.width;
+        sprite.height = dimensions.width;
+
         sprite.anchor.x = 0.5;
         sprite.anchor.y = 0.5;
+        sprite.mask = hexagon;
+        sprite.tint = 0x00FF00;
+
         this.addChild(sprite);
 
         tile.paths.observe((change)=>{
            var toCanonical = change.newValue.turnsToCanonical();
-            this.rotation = toCanonical.turns * (Math.PI / 3)
+            sprite.rotation = toCanonical.turns * (Math.PI / 3)
         });
+    }
+
+
+    private getSpriteName(directionSet:Hex.DirectionSet){
+        var name = ''
+        name += directionSet.contains(Hex.Direction.a) ? '1' : '0';
+        name += directionSet.contains(Hex.Direction.b) ? '1' : '0';
+        name += directionSet.contains(Hex.Direction.c) ? '1' : '0';
+        name += directionSet.contains(Hex.Direction.neg_a) ? '1' : '0';
+        name += directionSet.contains(Hex.Direction.neg_b) ? '1' : '0';
+        name += directionSet.contains(Hex.Direction.neg_c) ? '1' : '0';
+
+        return name+'.png'
     }
 
     private createHexagon(hexSize:number):Pixi.Graphics {

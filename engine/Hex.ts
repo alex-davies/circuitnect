@@ -56,7 +56,7 @@ class Hex{
     }
 
 
-    public static CartesianDimensions(hexSize:number, orientation:Hex.CartesianOrientation) : {width:numbe; height:number}{
+    public static CartesianDimensions(hexSize:number, orientation:Hex.CartesianOrientation) : {width:number; height:number}{
         switch(orientation){
             case Hex.CartesianOrientation.PointyTop:
                 return {
@@ -190,6 +190,10 @@ module Hex {
                 result.push(Hex.Turn(directionArray[i], turnAmount))
             }
             return new Hex.DirectionSet(result);
+        }
+
+        public contains(direction:Hex.Direction){
+            return this.values().indexOf(direction) !== -1;
         }
 
         public turnsToCanonical():{canonical:Hex.DirectionSet; turns:number}{

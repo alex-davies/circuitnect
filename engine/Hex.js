@@ -152,6 +152,9 @@ define(["require", "exports"], function (require, exports) {
                 }
                 return new Hex.DirectionSet(result);
             };
+            DirectionSet.prototype.contains = function (direction) {
+                return this.values().indexOf(direction) !== -1;
+            };
             DirectionSet.prototype.turnsToCanonical = function () {
                 for (var i = 0; i < DirectionSet.Canonical.length; i++) {
                     var potentialCanonical = this.turn(i);
