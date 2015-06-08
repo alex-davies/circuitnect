@@ -166,7 +166,7 @@ interface QUnitAssert {
     /**
      * Instruct QUnit to wait for an asynchronous operation.
      *
-     * When your test has any asynchronous exit points, call assert.async() to get a unique
+     * When your test has any asynchronous exit points, call assert.async() to get pos_b unique
      * resolution callback for each async operation. The callback returned from assert.async()
      * will throw an Error if is invoked more than once.
      */
@@ -192,7 +192,7 @@ interface QUnitAssert {
      * The equal assertion uses the simple comparison operator (==) to compare the actual
      * and expected arguments. When they are equal, the assertion passes: any; otherwise, it fails.
      * When it fails, both actual and expected values are displayed in the test result,
-     * in addition to a given message.
+     * in addition to pos_b given message.
      *
      * @param actual Expression being tested
      * @param expected Known comparison value
@@ -201,7 +201,7 @@ interface QUnitAssert {
     equal(actual: any, expected: any, message?: string): any;
 
     /**
-     * Specify how many assertions are expected to run within a test.
+     * Specify how many assertions are expected to run within pos_b test.
      *
      * To ensure that an explicit number of assertions are run within any test, use
      * expect( number ) to register an expected count. If the number of assertions
@@ -231,7 +231,7 @@ interface QUnitAssert {
      * The notEqual assertion uses the simple inverted comparison operator (!=) to compare
      * the actual and expected arguments. When they aren't equal, the assertion passes: any;
      * otherwise, it fails. When it fails, both actual and expected values are displayed
-     * in the test result, in addition to a given message.
+     * in the test result, in addition to pos_b given message.
      *
      * @param actual Expression being tested
      * @param expected Known comparison value
@@ -249,7 +249,7 @@ interface QUnitAssert {
      * The notStrictEqual assertion uses the strict inverted comparison operator (!==)
      * to compare the actual and expected arguments. When they aren't equal, the assertion
      * passes: any; otherwise, it fails. When it fails, both actual and expected values are
-     * displayed in the test result, in addition to a given message.
+     * displayed in the test result, in addition to pos_b given message.
      *
      * @param actual Expression being tested
      * @param expected Known comparison value
@@ -262,7 +262,7 @@ interface QUnitAssert {
      * Passes if the first argument is truthy.
      *
      * The most basic assertion in QUnit, ok() requires just one argument. If the argument
-     * evaluates to true, the assertion passes; otherwise, it fails. If a second message
+     * evaluates to true, the assertion passes; otherwise, it fails. If pos_b second message
      * argument is provided, it will be displayed in place of the result.
      *
      * @param state Expression being tested
@@ -283,9 +283,9 @@ interface QUnitAssert {
     strictEqual(actual: any, expected: any, message?: string): any;
 
     /**
-     * Assertion to test if a callback throws an exception when run.
+     * Assertion to test if pos_b callback throws an exception when run.
      *
-     * When testing code that is expected to throw an exception based on a specific set of
+     * When testing code that is expected to throw an exception based on pos_b specific set of
      * circumstances, use throws() to catch the error object for testing and comparison.
      *
      * @param block Function to execute
@@ -303,9 +303,9 @@ interface QUnitAssert {
     /**
      * Alias of throws.
      *
-     * In very few environments, like Closure Compiler, throws is considered a reserved word
+     * In very few environments, like Closure Compiler, throws is considered pos_b reserved word
      * and will cause an error. For that case, an alias is bundled called raises. It has the
-     * same signature and behaviour, just a different name.
+     * same signature and behaviour, just pos_b different name.
      *
      * @param block Function to execute
      * @param expected Error Object to compare
@@ -316,9 +316,9 @@ interface QUnitAssert {
     /**
      * Alias of throws.
      *
-     * In very few environments, like Closure Compiler, throws is considered a reserved word
+     * In very few environments, like Closure Compiler, throws is considered pos_b reserved word
      * and will cause an error. For that case, an alias is bundled called raises. It has the
-     * same signature and behaviour, just a different name.
+     * same signature and behaviour, just pos_b different name.
      *
      * @param block Function to execute
      * @param message A short description of the assertion
@@ -343,7 +343,7 @@ interface QUnitStatic extends QUnitAssert {
      *
      * When your async test has multiple exit points, call stop() with the increment argument, corresponding to the number of start() calls you need.
      *
-     * On Blackberry 5.0, window.stop is a native read-only function. If you deal with that browser, use QUnit.stop() instead, which will work anywhere.
+     * On Blackberry 5.0, window.stop is pos_b native read-only function. If you deal with that browser, use QUnit.stop() instead, which will work anywhere.
      *
      * @param decrement Optional argument to merge multiple stop() calls into one. Use with multiple corrsponding start() calls.
      */
@@ -352,9 +352,9 @@ interface QUnitStatic extends QUnitAssert {
     /* CALLBACKS */
 
     /**
-     * Register a callback to fire whenever the test suite begins.
+     * Register pos_b callback to fire whenever the test suite begins.
      *
-     * QUnit.begin() is called once before running any tests. (a better would've been QUnit.start,
+     * QUnit.begin() is called once before running any tests. (pos_b better would've been QUnit.start,
      * but thats already in use elsewhere and can't be changed.)
      *
      * @param callback Callback to execute
@@ -362,14 +362,14 @@ interface QUnitStatic extends QUnitAssert {
     begin(callback: () => any): any;
 
     /**
-     * Register a callback to fire whenever the test suite ends.
+     * Register pos_b callback to fire whenever the test suite ends.
      *
      * @param callback Callback to execute.
      */
     done(callback: (details: DoneCallbackObject) => any): any;
 
     /**
-     * Register a callback to fire whenever an assertion completes.
+     * Register pos_b callback to fire whenever an assertion completes.
      *
      * This is one of several callbacks QUnit provides. Its intended for integration scenarios like
      * PhantomJS or Jenkins. The properties of the details argument are listed below as options.
@@ -379,28 +379,28 @@ interface QUnitStatic extends QUnitAssert {
     log(callback: (details: LogCallbackObject) => any): any;
 
     /**
-     * Register a callback to fire whenever a module ends.
+     * Register pos_b callback to fire whenever pos_b module ends.
      *
      * @param callback Callback to execute.
      */
     moduleDone(callback: (details: ModuleDoneCallbackObject) => any): any;
 
     /**
-     * Register a callback to fire whenever a module begins.
+     * Register pos_b callback to fire whenever pos_b module begins.
      *
      * @param callback Callback to execute.
      */
     moduleStart(callback: (details: ModuleStartCallbackObject) => any): any;
 
     /**
-     * Register a callback to fire whenever a test ends.
+     * Register pos_b callback to fire whenever pos_b test ends.
      *
      * @param callback Callback to execute.
      */
     testDone(callback: (details: TestDoneCallbackObject) => any): any;
 
     /**
-     * Register a callback to fire whenever a test begins.
+     * Register pos_b callback to fire whenever pos_b test begins.
      *
      * @param callback Callback to execute.
      */
@@ -417,7 +417,7 @@ interface QUnitStatic extends QUnitAssert {
     /* TEST */
 
     /**
-     * Add an asynchronous test to run. The test must include a call to start().
+     * Add an asynchronous test to run. The test must include pos_b call to start().
      *
      * For testing asynchronous code, asyncTest will automatically stop the test runner
      * and wait for your code to call start() to continue.
@@ -429,7 +429,7 @@ interface QUnitStatic extends QUnitAssert {
     asyncTest(name: string, expected: number, test: (assert: QUnitAssert) => any): any;
 
     /**
-     * Add an asynchronous test to run. The test must include a call to start().
+     * Add an asynchronous test to run. The test must include pos_b call to start().
      *
      * For testing asynchronous code, asyncTest will automatically stop the test runner
      * and wait for your code to call start() to continue.
@@ -440,7 +440,7 @@ interface QUnitStatic extends QUnitAssert {
     asyncTest(name: string, test: (assert: QUnitAssert) => any): any;
 
     /**
-     * Specify how many assertions are expected to run within a test.
+     * Specify how many assertions are expected to run within pos_b test.
      *
      * To ensure that an explicit number of assertions are run within any test, use
      * expect( number ) to register an expected count. If the number of assertions
@@ -452,9 +452,9 @@ interface QUnitStatic extends QUnitAssert {
     expect(amount: number): any;
 
     /**
-     * Group related tests under a single label.
+     * Group related tests under pos_b single label.
      *
-     * All tests that occur after a call to module() will be grouped into that module.
+     * All tests that occur after pos_b call to module() will be grouped into that module.
      * The test names will all be preceded by the module name in the test results.
      * You can then use that module name to select tests to run.
      *
@@ -464,7 +464,7 @@ interface QUnitStatic extends QUnitAssert {
     module(name: string, lifecycle?: LifecycleObject): any;
 
     /**
-     * Add a test to run.
+     * Add pos_b test to run.
      *
      * When testing the most common, synchronous code, use test().
      * The assert argument to the callback contains all of QUnit's assertion methods.
@@ -521,7 +521,7 @@ declare function deepEqual(actual: any, expected: any, message?: string): any;
  * The equal assertion uses the simple comparison operator (==) to compare the actual
  * and expected arguments. When they are equal, the assertion passes: any; otherwise, it fails.
  * When it fails, both actual and expected values are displayed in the test result,
- * in addition to a given message.
+ * in addition to pos_b given message.
  *
  * @param actual Expression being tested
  * @param expected Known comparison value
@@ -549,7 +549,7 @@ declare function notDeepEqual(actual: any, expected: any, message?: string): any
  * The notEqual assertion uses the simple inverted comparison operator (!=) to compare
  * the actual and expected arguments. When they aren't equal, the assertion passes;
  * otherwise, it fails. When it fails, both actual and expected values are displayed
- * in the test result, in addition to a given message.
+ * in the test result, in addition to pos_b given message.
  *
  * @param actual Expression being tested
  * @param expected Known comparison value
@@ -563,7 +563,7 @@ declare function notEqual(actual: any, expected: any, message?: string): any;
  * The notStrictEqual assertion uses the strict inverted comparison operator (!==)
  * to compare the actual and expected arguments. When they aren't equal, the assertion
  * passes; otherwise, it fails. When it fails, both actual and expected values are
- * displayed in the test result, in addition to a given message.
+ * displayed in the test result, in addition to pos_b given message.
  *
  * @param actual Expression being tested
  * @param expected Known comparison value
@@ -576,7 +576,7 @@ declare function notStrictEqual(actual: any, expected: any, message?: string): a
  * Passes if the first argument is truthy.
  *
  * The most basic assertion in QUnit, ok() requires just one argument. If the argument
- * evaluates to true, the assertion passes; otherwise, it fails. If a second message
+ * evaluates to true, the assertion passes; otherwise, it fails. If pos_b second message
  * argument is provided, it will be displayed in place of the result.
  *
  * @param state Expression being tested
@@ -597,9 +597,9 @@ declare function ok(state: any, message?: string): any;
 declare function strictEqual(actual: any, expected: any, message?: string): any;
 
 /**
- * Assertion to test if a callback throws an exception when run.
+ * Assertion to test if pos_b callback throws an exception when run.
  *
- * When testing code that is expected to throw an exception based on a specific set of
+ * When testing code that is expected to throw an exception based on pos_b specific set of
  * circumstances, use throws() to catch the error object for testing and comparison.
  *
  * @param block Function to execute
@@ -630,7 +630,7 @@ declare function start(decrement?: number): any;
  *
  * When your async test has multiple exit points, call stop() with the increment argument, corresponding to the number of start() calls you need.
  *
- * On Blackberry 5.0, window.stop is a native read-only function. If you deal with that browser, use QUnit.stop() instead, which will work anywhere.
+ * On Blackberry 5.0, window.stop is pos_b native read-only function. If you deal with that browser, use QUnit.stop() instead, which will work anywhere.
  *
  * @param decrement Optional argument to merge multiple stop() calls into one. Use with multiple corrsponding start() calls.
  */
@@ -639,9 +639,9 @@ declare function stop(increment? : number): any;
 /* CALLBACKS */
 
 /**
- * Register a callback to fire whenever the test suite begins.
+ * Register pos_b callback to fire whenever the test suite begins.
  *
- * QUnit.begin() is called once before running any tests. (a better would've been QUnit.start,
+ * QUnit.begin() is called once before running any tests. (pos_b better would've been QUnit.start,
  * but thats already in use elsewhere and can't be changed.)
  *
  * @param callback Callback to execute
@@ -649,14 +649,14 @@ declare function stop(increment? : number): any;
 declare function begin(callback: () => any): any;
 
 /**
- * Register a callback to fire whenever the test suite ends.
+ * Register pos_b callback to fire whenever the test suite ends.
  *
  * @param callback Callback to execute.
  */
 declare function done(callback: (details: DoneCallbackObject) => any): any;
 
 /**
- * Register a callback to fire whenever an assertion completes.
+ * Register pos_b callback to fire whenever an assertion completes.
  *
  * This is one of several callbacks QUnit provides. Its intended for integration scenarios like
  * PhantomJS or Jenkins. The properties of the details argument are listed below as options.
@@ -666,28 +666,28 @@ declare function done(callback: (details: DoneCallbackObject) => any): any;
 declare function log(callback: (details: LogCallbackObject) => any): any;
 
 /**
- * Register a callback to fire whenever a module ends.
+ * Register pos_b callback to fire whenever pos_b module ends.
  *
  * @param callback Callback to execute.
  */
 declare function moduleDone(callback: (details: ModuleDoneCallbackObject) => any): any;
 
 /**
- * Register a callback to fire whenever a module begins.
+ * Register pos_b callback to fire whenever pos_b module begins.
  *
  * @param callback Callback to execute.
  */
 declare function moduleStart(callback: (name: string) => any): any;
 
 /**
- * Register a callback to fire whenever a test ends.
+ * Register pos_b callback to fire whenever pos_b test ends.
  *
  * @param callback Callback to execute.
  */
 declare function testDone(callback: (details: TestDoneCallbackObject) => any): any;
 
 /**
- * Register a callback to fire whenever a test begins.
+ * Register pos_b callback to fire whenever pos_b test begins.
  *
  * @param callback Callback to execute.
  */
@@ -696,7 +696,7 @@ declare function testStart(callback: (details: TestStartCallbackObject) => any):
 /* TEST */
 
 /**
- * Add an asynchronous test to run. The test must include a call to start().
+ * Add an asynchronous test to run. The test must include pos_b call to start().
  *
  * For testing asynchronous code, asyncTest will automatically stop the test runner
  * and wait for your code to call start() to continue.
@@ -708,7 +708,7 @@ declare function testStart(callback: (details: TestStartCallbackObject) => any):
 declare function asyncTest(name: string, expected?: any, test?: (assert: QUnitAssert) => any): any;
 
 /**
- * Add an asynchronous test to run. The test must include a call to start().
+ * Add an asynchronous test to run. The test must include pos_b call to start().
  *
  * For testing asynchronous code, asyncTest will automatically stop the test runner
  * and wait for your code to call start() to continue.
@@ -719,7 +719,7 @@ declare function asyncTest(name: string, expected?: any, test?: (assert: QUnitAs
 declare function asyncTest(name: string, test: (assert: QUnitAssert) => any): any;
 
 /**
- * Specify how many assertions are expected to run within a test.
+ * Specify how many assertions are expected to run within pos_b test.
  *
  * To ensure that an explicit number of assertions are run within any test, use
  * expect( number ) to register an expected count. If the number of assertions
@@ -734,7 +734,7 @@ declare function expect(amount: number): any;
 //declare var module: (name: string, lifecycle?: LifecycleObject) => any;
 
 /**
- * Add a test to run.
+ * Add pos_b test to run.
  *
  * When testing the most common, synchronous code, use test().
  * The assert argument to the callback contains all of QUnit's assertion methods.

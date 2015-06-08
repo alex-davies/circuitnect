@@ -52,37 +52,51 @@ define(["require", "exports", "lib/pixi/3.0.5/pixi", 'engine/Hex', 'util/Hashtab
     var TileDisplay = (function (_super) {
         __extends(TileDisplay, _super);
         function TileDisplay(tile, hexSize) {
+            var _this = this;
             _super.call(this);
-            var hexagon = this.createHexagon(hexSize);
+            this.tile = tile;
+            this.hexSize = hexSize;
+            var hexagon = this.createHexagon(hexSize, 0xaaaaaa);
             this.addChild(hexagon);
-            //placeholder
-            var spriteName = this.getSpriteName(tile.paths());
-            var sprite = new Pixi.Sprite(Pixi.Texture.fromImage(spriteName));
-            var dimensions = Hex.CartesianDimensions(hexSize, 0 /* FlatTop */);
-            var ratio = sprite.height / sprite.width;
-            sprite.width = dimensions.width;
-            sprite.height = dimensions.width;
-            sprite.anchor.x = 0.5;
-            sprite.anchor.y = 0.5;
-            sprite.mask = hexagon;
-            sprite.tint = 0x00FF00;
-            this.addChild(sprite);
+            this.alignTexture();
             tile.paths.observe(function (change) {
-                var toCanonical = change.newValue.turnsToCanonical();
-                sprite.rotation = toCanonical.turns * (Math.PI / 3);
+                _this.alignTexture();
             });
         }
+        TileDisplay.prototype.alignTexture = function () {
+            var toCanonical = this.tile.paths().turnsToCanonical();
+            var spriteName = this.getSpriteName(toCanonical.canonical);
+            //the sprite we created before is different the one we are now
+            //we will remove our old sprite and add pos_b new one
+            if (spriteName !== this.spriteTextureName) {
+                this.removeChild(this.sprite);
+                this.removeChild(this.mask);
+                this.sprite = new Pixi.Sprite(Pixi.Texture.fromImage(spriteName));
+                this.addChild(this.sprite);
+                var dimensions = Hex.CartesianDimensions(this.hexSize, 0 /* FlatTop */);
+                this.sprite.width = dimensions.width;
+                this.sprite.height = dimensions.width;
+                this.sprite.anchor.x = 0.5;
+                this.sprite.anchor.y = 0.5;
+                this.sprite.tint = 0x00FF00;
+                this.mask = this.sprite.mask = this.createHexagon(this.hexSize, 0x000000, 0x000000);
+                this.addChild(this.mask);
+                this.sprite.mask = this.mask;
+            }
+            //this.sprite.rotation = toCanonical.turns * (Math.PI / 3);
+            this.sprite.rotation = -toCanonical.turns * (Math.PI / 3);
+        };
         TileDisplay.prototype.getSpriteName = function (directionSet) {
             var name = '';
-            name += directionSet.contains(0 /* a */) ? '1' : '0';
-            name += directionSet.contains(1 /* b */) ? '1' : '0';
-            name += directionSet.contains(2 /* c */) ? '1' : '0';
+            name += directionSet.contains(5 /* pos_b */) ? '1' : '0';
+            name += directionSet.contains(0 /* pos_a */) ? '1' : '0';
+            name += directionSet.contains(1 /* pos_a_neg_b */) ? '1' : '0';
+            name += directionSet.contains(2 /* neg_b */) ? '1' : '0';
             name += directionSet.contains(3 /* neg_a */) ? '1' : '0';
-            name += directionSet.contains(4 /* neg_b */) ? '1' : '0';
-            name += directionSet.contains(5 /* neg_c */) ? '1' : '0';
+            name += directionSet.contains(4 /* neg_a_pos_b */) ? '1' : '0';
             return name + '.png';
         };
-        TileDisplay.prototype.createHexagon = function (hexSize) {
+        TileDisplay.prototype.createHexagon = function (hexSize, lineColor, fillColor) {
             var dimensions = Hex.CartesianDimensions(hexSize, 0 /* FlatTop */);
             var width = dimensions.width;
             var height = dimensions.height;
@@ -90,16 +104,24 @@ define(["require", "exports", "lib/pixi/3.0.5/pixi", 'engine/Hex', 'util/Hashtab
             var halfHeight = height / 2;
             var quarterWidth = width / 4;
             var quarterHeight = height / 4;
+            var hasFill = typeof fillColor !== "undefined";
             var graphics = new Pixi.Graphics();
-            graphics.beginFill(0xFF3300);
-            graphics.lineStyle(1, 0xaaaaaa, 1);
+            if (hasFill) {
+                graphics.beginFill(fillColor);
+            }
+            graphics.lineStyle(2, 0xaaaaaa, 1);
             graphics.moveTo(-halfWidth, 0);
             graphics.lineTo(-quarterWidth, halfHeight);
             graphics.lineTo(quarterWidth, halfHeight);
             graphics.lineTo(halfWidth, 0);
             graphics.lineTo(quarterWidth, -halfHeight);
             graphics.lineTo(-quarterWidth, -halfHeight);
-            graphics.endFill();
+            if (hasFill) {
+                graphics.endFill();
+            }
+            else {
+                graphics.lineTo(-halfWidth, 0);
+            }
             return graphics;
         };
         return TileDisplay;

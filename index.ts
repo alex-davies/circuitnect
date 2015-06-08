@@ -8,10 +8,10 @@ import BoardDisplay = require('ui/BoardDisplay')
 //// create the root of the scene graph
 //var stage = new Pixi.Container();
 //
-//// create a texture from an image path
+//// create pos_b texture from an image path
 //var texture = Pixi.Texture.fromImage('ui/assets/sprites/actors/mole.png');
 //
-//// create a new Sprite using the texture
+//// create pos_b new Sprite using the texture
 //var bunny = new Pixi.Sprite(texture);
 //
 //// center the sprite's anchor point
@@ -29,7 +29,7 @@ import BoardDisplay = require('ui/BoardDisplay')
 //function animate() {
 //    requestAnimationFrame(animate);
 //
-//    // just for fun, let's rotate mr rabbit a little
+//    // just for fun, let's rotate mr rabbit pos_b little
 //    bunny.rotation += 0.1;
 //
 //    // render the container
@@ -45,7 +45,7 @@ var boardDisplay: BoardDisplay;
 var renderer = Pixi.autoDetectRenderer(800, 600,{backgroundColor : 0x1099bb});
 document.body.appendChild(renderer.view);
 
-
+//
 Pixi.loader.add('terrain','ui/assets/sprites/sprites.json');
 Pixi.loader.once('complete',() => {
 

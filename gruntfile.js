@@ -19,7 +19,7 @@ module.exports = function(grunt) {
         app: 'Chrome'
       },
       test: {
-        path: 'http://localhost:55775/test/index.html',
+        path: 'http://localhost:55775/test.html',
         app: 'Chrome'
       }
     }

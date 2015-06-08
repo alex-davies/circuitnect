@@ -63,47 +63,67 @@ class BoardDisplay extends Pixi.Container {
 }
 
 class TileDisplay extends Pixi.Container{
-    constructor(tile: Tile, hexSize: number) {
+
+
+
+    constructor(private tile: Tile, private hexSize: number) {
         super();
 
-        var hexagon = this.createHexagon(hexSize);
+        var hexagon = this.createHexagon(hexSize, 0xaaaaaa);
         this.addChild(hexagon);
 
-        //placeholder
-        var spriteName = this.getSpriteName(tile.paths());
-        var sprite = new Pixi.Sprite(Pixi.Texture.fromImage(spriteName));
-        var dimensions = Hex.CartesianDimensions(hexSize, Hex.CartesianOrientation.FlatTop);
-        var ratio = sprite.height / sprite.width;
-        sprite.width = dimensions.width;
-        sprite.height = dimensions.width;
-
-        sprite.anchor.x = 0.5;
-        sprite.anchor.y = 0.5;
-        sprite.mask = hexagon;
-        sprite.tint = 0x00FF00;
-
-        this.addChild(sprite);
+        this.alignTexture();
 
         tile.paths.observe((change)=>{
-           var toCanonical = change.newValue.turnsToCanonical();
-            sprite.rotation = toCanonical.turns * (Math.PI / 3)
+            this.alignTexture()
         });
     }
 
+    sprite:Pixi.Sprite;
+    spriteTextureName:string;
+    mask:Pixi.Graphics;
+
+    private alignTexture(){
+        var toCanonical = this.tile.paths().turnsToCanonical();
+        var spriteName = this.getSpriteName(toCanonical.canonical);
+
+        //the sprite we created before is different the one we are now
+        //we will remove our old sprite and add pos_b new one
+        if(spriteName !== this.spriteTextureName){
+            this.removeChild(this.sprite);
+            this.removeChild(this.mask);
+
+            this.sprite = new Pixi.Sprite(Pixi.Texture.fromImage(spriteName));
+            this.addChild(this.sprite);
+            var dimensions = Hex.CartesianDimensions(this.hexSize, Hex.CartesianOrientation.FlatTop);
+            this.sprite.width = dimensions.width;
+            this.sprite.height = dimensions.width;
+            this.sprite.anchor.x = 0.5;
+            this.sprite.anchor.y = 0.5;
+            this.sprite.tint = 0x00FF00;
+
+            this.mask = this.sprite.mask = this.createHexagon(this.hexSize, 0x000000,0x000000);
+            this.addChild(this.mask);
+            this.sprite.mask = this.mask;
+        }
+
+        //this.sprite.rotation = toCanonical.turns * (Math.PI / 3);
+        this.sprite.rotation = -toCanonical.turns * (Math.PI / 3);
+    }
 
     private getSpriteName(directionSet:Hex.DirectionSet){
         var name = ''
-        name += directionSet.contains(Hex.Direction.a) ? '1' : '0';
-        name += directionSet.contains(Hex.Direction.b) ? '1' : '0';
-        name += directionSet.contains(Hex.Direction.c) ? '1' : '0';
-        name += directionSet.contains(Hex.Direction.neg_a) ? '1' : '0';
+        name += directionSet.contains(Hex.Direction.pos_b) ? '1' : '0';
+        name += directionSet.contains(Hex.Direction.pos_a) ? '1' : '0';
+        name += directionSet.contains(Hex.Direction.pos_a_neg_b) ? '1' : '0';
         name += directionSet.contains(Hex.Direction.neg_b) ? '1' : '0';
-        name += directionSet.contains(Hex.Direction.neg_c) ? '1' : '0';
+        name += directionSet.contains(Hex.Direction.neg_a) ? '1' : '0';
+        name += directionSet.contains(Hex.Direction.neg_a_pos_b) ? '1' : '0';
 
         return name+'.png'
     }
 
-    private createHexagon(hexSize:number):Pixi.Graphics {
+    private createHexagon(hexSize:number, lineColor:number, fillColor?:number):Pixi.Graphics {
         var dimensions = Hex.CartesianDimensions(hexSize,  Hex.CartesianOrientation.FlatTop);
         var width = dimensions.width;
         var height = dimensions.height;
@@ -112,17 +132,19 @@ class TileDisplay extends Pixi.Container{
         var quarterWidth = width/4;
         var quarterHeight = height/4;
 
+        var hasFill = typeof fillColor !== "undefined";
 
         var graphics = new Pixi.Graphics();
-        graphics.beginFill(0xFF3300);
-        graphics.lineStyle(1, 0xaaaaaa, 1);
+        if(hasFill) { graphics.beginFill(fillColor);}
+        graphics.lineStyle(2, 0xaaaaaa, 1);
         graphics.moveTo(-halfWidth,0);
         graphics.lineTo(-quarterWidth, halfHeight);
         graphics.lineTo(quarterWidth, halfHeight);
         graphics.lineTo(halfWidth, 0);
         graphics.lineTo(quarterWidth, -halfHeight);
         graphics.lineTo(-quarterWidth, -halfHeight);
-        graphics.endFill();
+        if(hasFill) { graphics.endFill();}
+        else{graphics.lineTo(-halfWidth,0);}
 
         return graphics;
     }

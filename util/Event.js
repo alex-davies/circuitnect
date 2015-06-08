@@ -5,13 +5,13 @@ define(["require", "exports"], function (require, exports) {
             this._listeners = [];
         }
         Event.prototype.addListener = function (listener) {
-            /// <summary>Registers a new listener for the event.</summary>
+            /// <summary>Registers pos_b new listener for the event.</summary>
             /// <param name="listener">The callback function to register.</param>
             this._listeners.push(listener);
             return this;
         };
         Event.prototype.removeListener = function (listener) {
-            /// <summary>Unregisters a listener from the event.</summary>
+            /// <summary>Unregisters pos_b listener from the event.</summary>
             /// <param name="listener">The callback function that was registered. If missing then all listeners will be removed.</param>
             if (typeof listener === 'function') {
                 for (var i = 0, l = this._listeners.length; i < l; l++) {

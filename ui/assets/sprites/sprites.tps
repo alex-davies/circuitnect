@@ -193,12 +193,14 @@
             <filename>tiles/101000.png</filename>
             <filename>tiles/110000.png</filename>
             <filename>tiles/101010.png</filename>
-            <filename>tiles/101100.png</filename>
             <filename>tiles/110100.png</filename>
             <filename>tiles/111000.png</filename>
             <filename>tiles/111010.png</filename>
             <filename>tiles/111100.png</filename>
             <filename>tiles/111110.png</filename>
+            <filename>tiles/110010.png</filename>
+            <filename>tiles/110110.png</filename>
+            <filename>tiles/111111.png</filename>
         </array>
         <key>ignoreFileList</key>
         <array/>
