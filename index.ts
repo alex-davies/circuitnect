@@ -1,7 +1,7 @@
 ﻿import Pixi = require("lib/pixi/3.0.5/pixi");
 import Board = require('engine/Board')
 import BoardDisplay = require('ui/BoardDisplay')
-
+import TWEEN = require('lib/tween/0.15.0/tween');
 //var renderer = Pixi.autoDetectRenderer(800, 600,{backgroundColor : 0x1099bb});
 //document.body.appendChild(renderer.view);
 //
@@ -42,7 +42,7 @@ var board: Board = new Board(3);
 var boardDisplay: BoardDisplay;
 
 // You can use either PIXI.WebGLRenderer or PIXI.CanvasRenderer
-var renderer = Pixi.autoDetectRenderer(800, 600,{backgroundColor : 0x1099bb});
+var renderer = Pixi.autoDetectRenderer(800, 600,{backgroundColor : 0x1099bb, antialias: true});
 document.body.appendChild(renderer.view);
 
 //
@@ -54,6 +54,7 @@ Pixi.loader.once('complete',() => {
     boardDisplay.position.y = 300;
 
     Pixi.ticker.shared.add(function (time) {
+        TWEEN.update();
         renderer.render(boardDisplay);
     });
 });

@@ -3,9 +3,13 @@ import Hashset = require('util/Hashset');
 class Hex{
     public static ZeroPoint = {a:0,b:0};
 
+    public static stringifyPoint(point:Hex.Point){
+        return point.a+','+point.b;
+    }
+
     public static Turn(direction:Hex.Direction, turnAmount:number = 1):Hex.Direction {
         var newDirection = (direction + turnAmount) % 6;
-        if(newDirection < 0)
+        while(newDirection < 0)
             newDirection+=6;
         return newDirection;
     }
@@ -137,11 +141,15 @@ module Hex {
     export enum Direction{
         //we will order them so they rotate in anti-clockwise direction
         pos_a = 0,
-        pos_a_neg_b =1,
-        neg_b =2,
+        pos_b =1,
+        neg_a_pos_b=2,
         neg_a=3,
-        neg_a_pos_b=4,
-        pos_b =5,
+        neg_b =4,
+        pos_a_neg_b =5,
+
+
+
+
     }
 
     export module Direction{

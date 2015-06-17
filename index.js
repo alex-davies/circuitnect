@@ -1,4 +1,4 @@
-define(["require", "exports", "lib/pixi/3.0.5/pixi", 'engine/Board', 'ui/BoardDisplay'], function (require, exports, Pixi, Board, BoardDisplay) {
+define(["require", "exports", "lib/pixi/3.0.5/pixi", 'engine/Board', 'ui/BoardDisplay', 'lib/tween/0.15.0/tween'], function (require, exports, Pixi, Board, BoardDisplay, TWEEN) {
     //var renderer = Pixi.autoDetectRenderer(800, 600,{backgroundColor : 0x1099bb});
     //document.body.appendChild(renderer.view);
     //
@@ -35,7 +35,7 @@ define(["require", "exports", "lib/pixi/3.0.5/pixi", 'engine/Board', 'ui/BoardDi
     var board = new Board(3);
     var boardDisplay;
     // You can use either PIXI.WebGLRenderer or PIXI.CanvasRenderer
-    var renderer = Pixi.autoDetectRenderer(800, 600, { backgroundColor: 0x1099bb });
+    var renderer = Pixi.autoDetectRenderer(800, 600, { backgroundColor: 0x1099bb, antialias: true });
     document.body.appendChild(renderer.view);
     //
     Pixi.loader.add('terrain', 'ui/assets/sprites/sprites.json');
@@ -44,6 +44,7 @@ define(["require", "exports", "lib/pixi/3.0.5/pixi", 'engine/Board', 'ui/BoardDi
         boardDisplay.position.x = 400;
         boardDisplay.position.y = 300;
         Pixi.ticker.shared.add(function (time) {
+            TWEEN.update();
             renderer.render(boardDisplay);
         });
     });

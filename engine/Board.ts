@@ -2,40 +2,52 @@ import Hex = require('./Hex');
 import Tile = require('./Tile');
 import Hashtable = require('util/Hashtable')
 import Hashset = require('util/Hashset')
+import Index = require('util/Index')
 
 interface Action{
     execute(board:Board);
 }
 
 class Board{
-    hexStore = new Hashtable<Hex.Point, Tile>(p => p.a+','+p.b);
-    radius:number;
-    constructor(radius:number){
-        this.radius = radius;
+    private tiles:Tile[] = [];
+    private pointIndex = new Index<Hex.Point, Tile>(this.tiles, (tile)=>tile.position, Hex.stringifyPoint);
+
+
+    constructor(private radius:number){
+
         var points = Hex.Spiral(Hex.ZeroPoint,radius);
 
         for(var i=0;i<points.length;i++){
             var point = points[i];
-            var tile = new Tile();
-            //tile.paths(new Hex.DirectionSet([Hex.Direction.pos_b]))
-            //var canonicals = Hex.DirectionSet.Canonical;
-            //var random = canonicals[Math.floor(Math.random() * canonicals.length)];
-            //tile.paths(random);
-            this.hexStore.put(point, tile);
+            var tile = new Tile(point);
+            this.tiles.push(tile);
         }
+        this.pointIndex.reindex();
 
-        //var tile = this.getTile(Hex.ZeroPoint);
-        //tile.paths(new Hex.DirectionSet([Hex.Direction.neg_a, Hex.Direction.neg_a, Hex.Direction.neg_a_pos_b,Hex.Direction.pos_b]));
+        //this.pointIndex.get({a:0,b:0}).paths(new Hex.DirectionSet([Hex.Direction.pos_b, Hex.Direction.pos_a_neg_b]))
+        //
+        //var base = new Hex.DirectionSet([Hex.Direction.neg_a]);
+        //this.pointIndex.get({a:1,b:0}).paths(base.turn(0))
+        //this.pointIndex.get({a:0,b:1}).paths(base.turn(-1))
+        //this.pointIndex.get({a:-1,b:1}).paths(base.turn(-2))
+        //this.pointIndex.get({a:-1,b:0}).paths(base.turn(-3))
+        //this.pointIndex.get({a:0,b:-1}).paths(base.turn(-4))
+        //this.pointIndex.get({a:1,b:-1}).paths(base.turn(-5))
 
         this.populateBoard([Hex.ZeroPoint], this);
+        //
+        //for(var i=0;i<this.tiles.length;i++){
+        //    var turns = Math.floor(Math.random() * 6)
+        //    this.tiles[i].paths(this.tiles[i].paths().turn(turns));
+        //}
+
     }
 
 
     public populateBoard(startPoints:Hex.Point[], board:Board){
         var rand = Math.random; //TODO: get a seedable random number generator
-        var hash = (point:Hex.Point)=>point.a + ','+point.b;
-        var processedPoints = new Hashset<Hex.Point>(hash);
-        var toProcessPoints = new Hashset<Hex.Point>(hash);
+        var processedPoints = new Hashset<Hex.Point>(Hex.stringifyPoint);
+        var toProcessPoints = new Hashset<Hex.Point>(Hex.stringifyPoint);
 
         for(var i=0;i<startPoints.length;i++){
             var tile = board.getTile(startPoints[i]);
@@ -78,24 +90,12 @@ class Board{
     }
 
 
-    public getTiles():{hexPoint:Hex.Point; tile:Tile}[]{
-        var result = [];
-        var points = Hex.Spiral(Hex.ZeroPoint,this.radius);
-        for(var i=0;i<points.length;i++){
-            var point = points[i];
-            var tile = this.getTile(point);
-            if(tile){
-                result.push({
-                    hexPoint:point,
-                    tile:tile
-                })
-            }
-        }
-        return result;
+    public getTiles():Tile[]{
+        return this.tiles;
     }
 
     public getTile(point:Hex.Point):Tile{
-        return this.hexStore.get(point);
+        return this.pointIndex.get(point);
     }
 
     public ExecuteAction(action: Action){

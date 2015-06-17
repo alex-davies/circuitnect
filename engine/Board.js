@@ -1,27 +1,36 @@
-define(["require", "exports", './Hex', './Tile', 'util/Hashtable', 'util/Hashset'], function (require, exports, Hex, Tile, Hashtable, Hashset) {
+define(["require", "exports", './Hex', './Tile', 'util/Hashset', 'util/Index'], function (require, exports, Hex, Tile, Hashset, Index) {
     var Board = (function () {
         function Board(radius) {
-            this.hexStore = new Hashtable(function (p) { return p.a + ',' + p.b; });
             this.radius = radius;
+            this.tiles = [];
+            this.pointIndex = new Index(this.tiles, function (tile) { return tile.position; }, Hex.stringifyPoint);
             var points = Hex.Spiral(Hex.ZeroPoint, radius);
             for (var i = 0; i < points.length; i++) {
                 var point = points[i];
-                var tile = new Tile();
-                //tile.paths(new Hex.DirectionSet([Hex.Direction.pos_b]))
-                //var canonicals = Hex.DirectionSet.Canonical;
-                //var random = canonicals[Math.floor(Math.random() * canonicals.length)];
-                //tile.paths(random);
-                this.hexStore.put(point, tile);
+                var tile = new Tile(point);
+                this.tiles.push(tile);
             }
-            //var tile = this.getTile(Hex.ZeroPoint);
-            //tile.paths(new Hex.DirectionSet([Hex.Direction.neg_a, Hex.Direction.neg_a, Hex.Direction.neg_a_pos_b,Hex.Direction.pos_b]));
+            this.pointIndex.reindex();
+            //this.pointIndex.get({a:0,b:0}).paths(new Hex.DirectionSet([Hex.Direction.pos_b, Hex.Direction.pos_a_neg_b]))
+            //
+            //var base = new Hex.DirectionSet([Hex.Direction.neg_a]);
+            //this.pointIndex.get({a:1,b:0}).paths(base.turn(0))
+            //this.pointIndex.get({a:0,b:1}).paths(base.turn(-1))
+            //this.pointIndex.get({a:-1,b:1}).paths(base.turn(-2))
+            //this.pointIndex.get({a:-1,b:0}).paths(base.turn(-3))
+            //this.pointIndex.get({a:0,b:-1}).paths(base.turn(-4))
+            //this.pointIndex.get({a:1,b:-1}).paths(base.turn(-5))
             this.populateBoard([Hex.ZeroPoint], this);
+            //
+            //for(var i=0;i<this.tiles.length;i++){
+            //    var turns = Math.floor(Math.random() * 6)
+            //    this.tiles[i].paths(this.tiles[i].paths().turn(turns));
+            //}
         }
         Board.prototype.populateBoard = function (startPoints, board) {
             var rand = Math.random; //TODO: get a seedable random number generator
-            var hash = function (point) { return point.a + ',' + point.b; };
-            var processedPoints = new Hashset(hash);
-            var toProcessPoints = new Hashset(hash);
+            var processedPoints = new Hashset(Hex.stringifyPoint);
+            var toProcessPoints = new Hashset(Hex.stringifyPoint);
             for (var i = 0; i < startPoints.length; i++) {
                 var tile = board.getTile(startPoints[i]);
                 if (tile) {
@@ -55,22 +64,10 @@ define(["require", "exports", './Hex', './Tile', 'util/Hashtable', 'util/Hashset
             }
         };
         Board.prototype.getTiles = function () {
-            var result = [];
-            var points = Hex.Spiral(Hex.ZeroPoint, this.radius);
-            for (var i = 0; i < points.length; i++) {
-                var point = points[i];
-                var tile = this.getTile(point);
-                if (tile) {
-                    result.push({
-                        hexPoint: point,
-                        tile: tile
-                    });
-                }
-            }
-            return result;
+            return this.tiles;
         };
         Board.prototype.getTile = function (point) {
-            return this.hexStore.get(point);
+            return this.pointIndex.get(point);
         };
         Board.prototype.ExecuteAction = function (action) {
             console.debug('executing action', action);

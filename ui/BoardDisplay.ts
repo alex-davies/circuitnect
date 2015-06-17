@@ -1,22 +1,24 @@
 ﻿import Pixi = require("lib/pixi/3.0.5/pixi");
-import Board = require('engine/Board')
-import Hex = require('engine/Hex')
-import Tile = require('engine/Tile')
-import Hashtable = require('util/Hashtable')
-import RotateAction = require('engine/action/RotateAction')
+import Board = require('engine/Board');
+import Hex = require('engine/Hex');
+import Tile = require('engine/Tile');
+import Hashtable = require('util/Hashtable');
+import Index = require('util/Index');
+import RotateAction = require('engine/action/RotateAction');
+import TWEEN = require('lib/tween/0.15.0/tween');
 
 class BoardDisplay extends Pixi.Container {
-    board:Board;
-    hexSize:number;
-    tileDisplays:Hashtable<Hex.Point, TileDisplay> = new Hashtable<Hex.Point, TileDisplay>();
 
-
-    constructor(board: Board, hexSize: number) {
+    constructor(private board: Board, private hexSize: number) {
         super();
-        this.hexSize = hexSize;
-        this.board = board;
-
-        this.adjustTiles();
+        var factory = new TileArtist();
+        this.board.getTiles().forEach((tile, i)=> {
+            var tileDisplay = factory.drawTile(board, tile, this.hexSize);
+            var cartPoint = Hex.ToCartesianPoint(tile.position, hexSize, Hex.CartesianOrientation.FlatTop);
+            tileDisplay.position.x = cartPoint.x;
+            tileDisplay.position.y = cartPoint.y;
+            this.addChild(tileDisplay);
+        });
 
         this.hitArea = new Pixi.Rectangle(-400, -300, 800, 600);
         var eventy:any = this;
@@ -26,40 +28,162 @@ class BoardDisplay extends Pixi.Container {
             var hexPoint = Hex.ToHexPoint(point, this.hexSize, Hex.CartesianOrientation.FlatTop);
 
             //rotate the tile clockwise
-            board.ExecuteAction(new RotateAction(hexPoint, -1));
+            board.ExecuteAction(new RotateAction(hexPoint, 1));
         });
     }
 
-    private adjustTiles(){
 
-        var newTileDisplays = new Hashtable<Hex.Point, TileDisplay>();
-        this.board.getTiles().forEach((tile, i)=> {
-            var tileDisplay = this.tileDisplays.get(tile.hexPoint);
-            if(!tileDisplay) {
-                tileDisplay = new TileDisplay(tile.tile, this.hexSize);
-                this.addChild(tileDisplay);
+
+}
+
+interface MyTileDisplay extends Pixi.DisplayObject{
+    adjustToPaths(paths:Hex.DirectionSet)
+    adjustToActive(paths:Hex.DirectionSet)
+}
+
+class TileArtist{
+    static center = {x:0,y:0};
+    static outerCorners = new Hashtable<Hex.Direction, {x:number;y:number}>();
+    static outerSides = new Hashtable<Hex.Direction, {x:number;y:number}>();
+    static innerCorners = new Hashtable<Hex.Direction, {x:number;y:number}>();
+    static innerSides = new Hashtable<Hex.Direction, {x:number;y:number}>();
+
+    static ctor = (()=>{
+        var dimensions = Hex.CartesianDimensions(40,  Hex.CartesianOrientation.FlatTop);
+        var width = dimensions.width;
+        var height = dimensions.height;
+        var halfWidth = width/2;
+        var halfHeight = height/2;
+        var quarterWidth = width/4;
+        var quarterHeight = height/4;
+
+        var midPoint = (p1:{x:number;y:number}, p2:{x:number;y:number})=>{
+            return {
+                x: (p1.x + p2.x) / 2,
+                y: (p1.y + p2.y) / 2,
             }
+        };
+        var scale = (p1:{x:number;y:number}, factor)=>{
+            return {
+                x: p1.x * factor,
+                y: p1.y * factor,
+            }
+        };
 
-            var cartPoint = Hex.ToCartesianPoint(tile.hexPoint, this.hexSize, Hex.CartesianOrientation.FlatTop);
-            tileDisplay.x = cartPoint.x;
-            tileDisplay.y = cartPoint.y;
-            newTileDisplays.put(tile.hexPoint, tileDisplay);
+        var outerCorners = TileArtist.outerCorners;
+        outerCorners.put(Hex.Direction.pos_a, {x:quarterWidth,y:halfHeight} );
+        outerCorners.put(Hex.Direction.pos_b, {x:-quarterWidth,y:halfHeight} );
+        outerCorners.put(Hex.Direction.neg_a_pos_b, {x:-halfWidth,y:0} )
+        outerCorners.put(Hex.Direction.neg_a, {x:-quarterWidth,y:-halfHeight} );
+        outerCorners.put(Hex.Direction.neg_b, {x:quarterWidth,y:-halfHeight} );
+        outerCorners.put(Hex.Direction.pos_a_neg_b, {x:halfWidth,y:0} );
+
+        var outerSides = TileArtist.outerSides
+        outerSides.put(Hex.Direction.pos_b, midPoint(
+            outerCorners.get(Hex.Direction.pos_b),
+            outerCorners.get(Hex.Direction.pos_a)));
+
+        outerSides.put(Hex.Direction.pos_a, midPoint(
+            outerCorners.get(Hex.Direction.pos_a),
+            outerCorners.get(Hex.Direction.pos_a_neg_b)));
+
+        outerSides.put(Hex.Direction.pos_a_neg_b, midPoint(
+            outerCorners.get(Hex.Direction.pos_a_neg_b),
+            outerCorners.get(Hex.Direction.neg_b)));
+
+        outerSides.put(Hex.Direction.neg_b, midPoint(
+            outerCorners.get(Hex.Direction.neg_b),
+            outerCorners.get(Hex.Direction.neg_a)));
+
+        outerSides.put(Hex.Direction.neg_a, midPoint(
+            outerCorners.get(Hex.Direction.neg_a),
+            outerCorners.get(Hex.Direction.neg_a_pos_b)));
+
+        outerSides.put(Hex.Direction.neg_a_pos_b, midPoint(
+            outerCorners.get(Hex.Direction.neg_a_pos_b),
+            outerCorners.get(Hex.Direction.pos_b)));
+
+
+
+        var innerScaleFactor = 0.5;
+
+        var innerCorners = TileArtist.innerCorners;
+        outerCorners.entries().forEach((e)=>{
+            innerCorners.put(e.key, scale(e.value, innerScaleFactor))
         });
 
-        //remove items we had before but are no longer in our list
-        this.tileDisplays.entries().forEach((kvp, i)=>{
-            var newItem = newTileDisplays.get(kvp.key);
-            if(!newItem || newItem != kvp.value){
-                this.removeChild(kvp.value);
+        var innerSides = TileArtist.innerSides;
+        outerSides.entries().forEach((e)=>{
+            innerSides.put(e.key, scale(e.value, innerScaleFactor))
+        });
+
+    })();
+
+
+    drawTile(board:Board, tile:Tile, hexSize:number):Pixi.DisplayObject{
+
+        var initialPaths = tile.paths();
+
+        var graphics = this.drawDirections(new Pixi.Graphics(), initialPaths.values(), hexSize, 0x00FF00);
+
+        tile.paths.observe((change)=>{
+
+            var currentTurns = (Math.round(graphics.rotation / (Math.PI / 3)) % 6);
+            //check how many turns we need to make on top of our current turns so
+            //we have the same paths as the new direction set
+            for(var i=0;i<6;i++){
+                var targetTurns = (currentTurns + i) % 6;
+                if(initialPaths.turn(targetTurns).equals(change.newValue)) {
+                    console.log(currentTurns+"->"+targetTurns);
+                    var targetRotation = targetTurns * (Math.PI / 3);
+
+                    //ensure we keep turning clockwise
+                    if(targetRotation < graphics.rotation)
+                        targetRotation += Math.PI * 2;
+
+                    var tween = new TWEEN.Tween( { rt: graphics.rotation } )
+                        .to( { rt: targetRotation }, 300 )
+                        .easing( TWEEN.Easing.Elastic.Out )
+                        .onUpdate( function () {
+                            graphics.rotation = this.rt;
+                        })
+                        .start();
+                    break;
+                }
             }
         });
 
-        //set our new tile displays
-        this.tileDisplays = newTileDisplays;
+        return graphics;
 
     }
 
 
+
+    private drawDirections(graphics:Pixi.Graphics, directions:Hex.Direction[], hexSize:number, color:number):Pixi.Graphics{
+        graphics.lineStyle(14, color, 1);
+
+        for(var i=0;i<directions.length;i++){
+            var side = TileArtist.outerSides.get(directions[i]);
+            side = {
+                x:side.x,
+                y:side.y
+            }
+
+            graphics.moveTo(TileArtist.center.x,TileArtist.center.y);
+            graphics.lineTo(side.x, side.y);
+
+        }
+
+        //add a circle on the joint to hide the line joins
+        if(directions.length > 0) {
+            graphics.lineStyle(0, color, 1);
+            graphics.beginFill(color)
+            graphics.drawCircle(TileArtist.center.x, TileArtist.center.y, 7)
+            graphics.endFill()
+        }
+
+        return graphics;
+    }
 }
 
 class TileDisplay extends Pixi.Container{
@@ -70,16 +194,20 @@ class TileDisplay extends Pixi.Container{
         super();
 
         var hexagon = this.createHexagon(hexSize, 0xaaaaaa);
-        this.addChild(hexagon);
+        //this.addChild(hexagon);
 
         this.alignTexture();
+
+        var cartPoint = Hex.ToCartesianPoint(this.tile.position, this.hexSize, Hex.CartesianOrientation.FlatTop);
+        this.position.x = cartPoint.x;
+        this.position.y = cartPoint.y;
 
         tile.paths.observe((change)=>{
             this.alignTexture()
         });
     }
 
-    sprite:Pixi.Sprite;
+    sprite:Pixi.DisplayObject;
     spriteTextureName:string;
     mask:Pixi.Graphics;
 
@@ -90,17 +218,22 @@ class TileDisplay extends Pixi.Container{
         //the sprite we created before is different the one we are now
         //we will remove our old sprite and add pos_b new one
         if(spriteName !== this.spriteTextureName){
+
+
             this.removeChild(this.sprite);
             this.removeChild(this.mask);
 
-            this.sprite = new Pixi.Sprite(Pixi.Texture.fromImage(spriteName));
+            this.spriteTextureName = spriteName;
+            //this.sprite = new Pixi.Sprite(Pixi.Texture.fromImage(spriteName));
+            //this.sprite = new TileArtist().drawTile(this.tile, this.hexSize)
             this.addChild(this.sprite);
+
             var dimensions = Hex.CartesianDimensions(this.hexSize, Hex.CartesianOrientation.FlatTop);
-            this.sprite.width = dimensions.width;
-            this.sprite.height = dimensions.width;
-            this.sprite.anchor.x = 0.5;
-            this.sprite.anchor.y = 0.5;
-            this.sprite.tint = 0x00FF00;
+            //this.sprite.width = dimensions.width;
+            //this.sprite.height = dimensions.width;
+            //this.sprite.anchor.x = 0.5;
+            //this.sprite.anchor.y = 0.5;
+            //this.sprite.tint = 0x00FF00;
 
             this.mask = this.sprite.mask = this.createHexagon(this.hexSize, 0x000000,0x000000);
             this.addChild(this.mask);
@@ -108,9 +241,33 @@ class TileDisplay extends Pixi.Container{
         }
 
         //this.sprite.rotation = toCanonical.turns * (Math.PI / 3);
-        this.sprite.rotation = -toCanonical.turns * (Math.PI / 3);
+        //var fromRotation = this.normalizeRadians(this.sprite.rotation);
+        //var toRotation = this.normalizeRadians(-toCanonical.turns * (Math.PI / 3));
+        //console.log(toCanonical.turns);
+        //while(toRotation < fromRotation){
+        //    toRotation += Math.PI * 2
+        //}
+        //
+        //var self=this;
+        //console.log(fromRotation, toRotation);
+        //var tween = new TWEEN.Tween( { rt: fromRotation } )
+        //    .to( { rt: toRotation }, 100 )
+        //    .easing( TWEEN.Easing.Quadratic.Out )
+        //    .onUpdate( function () {
+        //        self.sprite.rotation = this.rt;
+        //    })
+        //    .start();
+
     }
 
+    private normalizeRadians(rads)
+    {
+        while(rads < 0)
+            rads+=Math.PI*2;
+        while(rads > Math.PI * 2)
+            rads -= Math.PI*2
+        return rads;
+    }
     private getSpriteName(directionSet:Hex.DirectionSet){
         var name = ''
         name += directionSet.contains(Hex.Direction.pos_b) ? '1' : '0';

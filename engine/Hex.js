@@ -2,10 +2,13 @@ define(["require", "exports", 'util/Hashset'], function (require, exports, Hashs
     var Hex = (function () {
         function Hex() {
         }
+        Hex.stringifyPoint = function (point) {
+            return point.a + ',' + point.b;
+        };
         Hex.Turn = function (direction, turnAmount) {
             if (turnAmount === void 0) { turnAmount = 1; }
             var newDirection = (direction + turnAmount) % 6;
-            if (newDirection < 0)
+            while (newDirection < 0)
                 newDirection += 6;
             return newDirection;
         };
@@ -14,15 +17,15 @@ define(["require", "exports", 'util/Hashset'], function (require, exports, Hashs
             switch (direction) {
                 case 0 /* pos_a */:
                     return { a: point.a + 1 * stepSize, b: point.b };
-                case 5 /* pos_b */:
+                case 1 /* pos_b */:
                     return { a: point.a, b: point.b + 1 * stepSize };
-                case 1 /* pos_a_neg_b */:
+                case 5 /* pos_a_neg_b */:
                     return { a: point.a + 1 * stepSize, b: point.b - 1 * stepSize };
                 case 3 /* neg_a */:
                     return { a: point.a - 1 * stepSize, b: point.b };
-                case 2 /* neg_b */:
+                case 4 /* neg_b */:
                     return { a: point.a, b: point.b - 1 * stepSize };
-                case 4 /* neg_a_pos_b */:
+                case 2 /* neg_a_pos_b */:
                     return { a: point.a - 1 * stepSize, b: point.b + 1 * stepSize };
                 default:
                     throw new Error("Unknown direction '" + direction + "'");
@@ -127,16 +130,16 @@ define(["require", "exports", 'util/Hashset'], function (require, exports, Hashs
         (function (Direction) {
             //we will order them so they rotate in anti-clockwise direction
             Direction[Direction["pos_a"] = 0] = "pos_a";
-            Direction[Direction["pos_a_neg_b"] = 1] = "pos_a_neg_b";
-            Direction[Direction["neg_b"] = 2] = "neg_b";
+            Direction[Direction["pos_b"] = 1] = "pos_b";
+            Direction[Direction["neg_a_pos_b"] = 2] = "neg_a_pos_b";
             Direction[Direction["neg_a"] = 3] = "neg_a";
-            Direction[Direction["neg_a_pos_b"] = 4] = "neg_a_pos_b";
-            Direction[Direction["pos_b"] = 5] = "pos_b";
+            Direction[Direction["neg_b"] = 4] = "neg_b";
+            Direction[Direction["pos_a_neg_b"] = 5] = "pos_a_neg_b";
         })(Hex.Direction || (Hex.Direction = {}));
         var Direction = Hex.Direction;
         var Direction;
         (function (Direction) {
-            Direction.all = [5 /* pos_b */, 0 /* pos_a */, 1 /* pos_a_neg_b */, 2 /* neg_b */, 2 /* neg_b */, 4 /* neg_a_pos_b */];
+            Direction.all = [1 /* pos_b */, 0 /* pos_a */, 5 /* pos_a_neg_b */, 4 /* neg_b */, 4 /* neg_b */, 2 /* neg_a_pos_b */];
         })(Direction = Hex.Direction || (Hex.Direction = {}));
         var DirectionSet = (function () {
             function DirectionSet(directions) {
@@ -187,19 +190,19 @@ define(["require", "exports", 'util/Hashset'], function (require, exports, Hashs
             };
             DirectionSet.Canonical = [
                 new DirectionSet([]),
-                new DirectionSet([5 /* pos_b */]),
-                new DirectionSet([5 /* pos_b */, 0 /* pos_a */]),
-                new DirectionSet([5 /* pos_b */, 1 /* pos_a_neg_b */]),
-                new DirectionSet([5 /* pos_b */, 2 /* neg_b */]),
-                new DirectionSet([5 /* pos_b */, 0 /* pos_a */, 1 /* pos_a_neg_b */]),
-                new DirectionSet([5 /* pos_b */, 0 /* pos_a */, 2 /* neg_b */]),
-                new DirectionSet([5 /* pos_b */, 0 /* pos_a */, 3 /* neg_a */]),
-                new DirectionSet([5 /* pos_b */, 1 /* pos_a_neg_b */, 3 /* neg_a */]),
-                new DirectionSet([5 /* pos_b */, 0 /* pos_a */, 1 /* pos_a_neg_b */, 2 /* neg_b */]),
-                new DirectionSet([5 /* pos_b */, 0 /* pos_a */, 1 /* pos_a_neg_b */, 3 /* neg_a */]),
-                new DirectionSet([5 /* pos_b */, 0 /* pos_a */, 2 /* neg_b */, 3 /* neg_a */]),
-                new DirectionSet([5 /* pos_b */, 0 /* pos_a */, 1 /* pos_a_neg_b */, 2 /* neg_b */, 3 /* neg_a */]),
-                new DirectionSet([5 /* pos_b */, 0 /* pos_a */, 1 /* pos_a_neg_b */, 2 /* neg_b */, 3 /* neg_a */, 4 /* neg_a_pos_b */]),
+                new DirectionSet([1 /* pos_b */]),
+                new DirectionSet([1 /* pos_b */, 0 /* pos_a */]),
+                new DirectionSet([1 /* pos_b */, 5 /* pos_a_neg_b */]),
+                new DirectionSet([1 /* pos_b */, 4 /* neg_b */]),
+                new DirectionSet([1 /* pos_b */, 0 /* pos_a */, 5 /* pos_a_neg_b */]),
+                new DirectionSet([1 /* pos_b */, 0 /* pos_a */, 4 /* neg_b */]),
+                new DirectionSet([1 /* pos_b */, 0 /* pos_a */, 3 /* neg_a */]),
+                new DirectionSet([1 /* pos_b */, 5 /* pos_a_neg_b */, 3 /* neg_a */]),
+                new DirectionSet([1 /* pos_b */, 0 /* pos_a */, 5 /* pos_a_neg_b */, 4 /* neg_b */]),
+                new DirectionSet([1 /* pos_b */, 0 /* pos_a */, 5 /* pos_a_neg_b */, 3 /* neg_a */]),
+                new DirectionSet([1 /* pos_b */, 0 /* pos_a */, 4 /* neg_b */, 3 /* neg_a */]),
+                new DirectionSet([1 /* pos_b */, 0 /* pos_a */, 5 /* pos_a_neg_b */, 4 /* neg_b */, 3 /* neg_a */]),
+                new DirectionSet([1 /* pos_b */, 0 /* pos_a */, 5 /* pos_a_neg_b */, 4 /* neg_b */, 3 /* neg_a */, 2 /* neg_a_pos_b */]),
             ];
             return DirectionSet;
         })();
